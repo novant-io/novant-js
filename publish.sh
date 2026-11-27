@@ -2,19 +2,13 @@
 #
 # Build and publish @novant/sdk to npm.
 #
-# Reads npm token from secret/npm.key (gitignored).
+# Uses your `npm login` session; npm prompts for 2FA in the browser.
 # Version is read from package.json (the single source of truth).
 #
 
 set -euo pipefail
 
 cd "$(dirname "$0")"
-
-token_file="secret/npm.key"
-if [[ ! -f "$token_file" ]]; then
-  echo "error: npm token not found at $token_file" >&2
-  exit 1
-fi
 
 version=$(node -p "require('./package.json').version")
 
@@ -23,7 +17,17 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
-echo "Publishing @novant/sdk $version to npm"
+if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+  echo "error: tag v$version already exists; roll the version in package.json" >&2
+  exit 1
+fi
+
+if ! user=$(npm whoami 2>/dev/null); then
+  echo "error: not logged in to npm; run 'npm login' first" >&2
+  exit 1
+fi
+
+echo "Publishing @novant/sdk $version to npm as $user"
 read -r -p "Continue? [y/N] " confirm
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
   echo "aborted"
@@ -35,11 +39,7 @@ npm run typecheck
 npm run test:unit
 npm run build
 
-# write a temporary npmrc so the token never lands in ~/.npmrc
-npmrc=$(mktemp)
-trap 'rm -f "$npmrc"' EXIT
-echo "//registry.npmjs.org/:_authToken=$(cat "$token_file")" > "$npmrc"
-npm publish --userconfig "$npmrc" --access public
+npm publish
 
 git tag "v$version"
 git push --tags
