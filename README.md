@@ -11,7 +11,7 @@ Full documentation at [docs.novant.io/sdk/js](https://docs.novant.io/sdk/js).
 ## Installation
 
 ```bash
-npm install novant
+npm install @novant/sdk
 ```
 
 Requires Node.js 18 or later. Ships ESM and CommonJS builds with
@@ -20,7 +20,7 @@ TypeScript types included. No runtime dependencies.
 ## Quick Start
 
 ```js
-import { NovantClient } from "novant";
+import { NovantClient } from "@novant/sdk";
 
 const client = new NovantClient({ apiKey: "ak_xxx" });
 
@@ -54,7 +54,7 @@ for (const row of trends) {
 CommonJS works too:
 
 ```js
-const { NovantClient } = require("novant");
+const { NovantClient } = require("@novant/sdk");
 ```
 
 ## Conventions
@@ -123,7 +123,7 @@ await client.writeBatch([
 given time. Pass the project timezone to evaluate in project local time:
 
 ```js
-import { scheduleActive } from "novant";
+import { scheduleActive } from "@novant/sdk";
 
 const { tz } = await client.project();
 const { schedules } = await client.schedules();
@@ -138,7 +138,7 @@ API errors throw a `NovantError` with the HTTP `status` and the API's
 error message:
 
 ```js
-import { NovantError } from "novant";
+import { NovantError } from "@novant/sdk";
 
 try {
   await client.write("s.1.3", 72.0);

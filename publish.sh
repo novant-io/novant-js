@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Build and publish novant to npm.
+# Build and publish @novant/sdk to npm.
 #
 # Reads npm token from secret/npm.key (gitignored).
 # Version is read from package.json (the single source of truth).
@@ -23,7 +23,7 @@ if [[ -n "$(git status --porcelain)" ]]; then
   exit 1
 fi
 
-echo "Publishing novant $version to npm"
+echo "Publishing @novant/sdk $version to npm"
 read -r -p "Continue? [y/N] " confirm
 if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
   echo "aborted"
@@ -44,4 +44,4 @@ npm publish --userconfig "$npmrc" --access public
 git tag "v$version"
 git push --tags
 
-echo "published novant $version"
+echo "published @novant/sdk $version"

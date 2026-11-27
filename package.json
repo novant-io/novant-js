@@ -1,5 +1,5 @@
 {
-  "name": "novant",
+  "name": "@novant/sdk",
   "version": "0.1.0",
   "description": "Server-side JavaScript/TypeScript library for the Novant API",
   "license": "MIT",
@@ -44,6 +44,9 @@
   "sideEffects": false,
   "engines": {
     "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsup",
