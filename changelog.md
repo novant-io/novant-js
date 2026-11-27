@@ -1,6 +1,8 @@
 # Changelog
 
-## Version 0.2 (working)
+## Version 0.3 (working)
+
+## Version 0.2 (27-Nov-2026)
 * Add `typedefZones`, `typedefSpaces`, `typedefAssets`, and `typedefPoints`
   for the `/v1/typedef` type registry
 * Add `dbo` to `Ontology`
