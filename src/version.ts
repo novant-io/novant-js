@@ -3,5 +3,9 @@
 // Licensed under the MIT License
 //
 
-/** SDK version; must match package.json (checked by unit tests). */
-export const VERSION = "0.1.0";
+// Injected from package.json at build time (see tsup.config.ts and
+// vitest.config.ts), so package.json is the single source of truth.
+declare const __NOVANT_VERSION__: string;
+
+/** SDK version. */
+export const VERSION: string = __NOVANT_VERSION__;
