@@ -1,0 +1,62 @@
+{
+  "name": "novant",
+  "version": "0.1.0",
+  "description": "Server-side JavaScript/TypeScript library for the Novant API",
+  "license": "MIT",
+  "author": "Novant <support@novant.io>",
+  "homepage": "https://docs.novant.io/sdk/js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/novant-io/novant-js.git"
+  },
+  "bugs": "https://github.com/novant-io/novant-js/issues",
+  "keywords": [
+    "novant",
+    "novant-sdk",
+    "iot",
+    "building-automation",
+    "bacnet",
+    "sdk"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "changelog.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run test/unit",
+    "test:integration": "vitest run test/integration",
+    "prepublishOnly": "npm run typecheck && npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.11",
+    "tsup": "^8.5.1",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.12"
+  }
+}
