@@ -132,6 +132,24 @@ describe.skipIf(!testKey)("endpoints (live)", () => {
     for (const row of res.trends) expect(typeof row.ts).toBe("string");
   });
 
+  it("point props are registry props and not duplicated at the root", async (ctx) => {
+    // if this fails, the API added a core point field: add it to
+    // POINT_BASE_KEYS in src/client.ts (and novant-python)
+    const known = new Set((await client.typedefPoints()).props.map((p) => p.id));
+    let checked = 0;
+    for (const s of (await client.sources({ bound_only: true })).sources) {
+      for (const p of (await client.points({ source_id: s.id })).points) {
+        expect(typeof p.props).toBe("object");
+        for (const k of Object.keys(p.props)) {
+          expect(known).toContain(k);
+          expect(k in p).toBe(false);
+          checked++;
+        }
+      }
+    }
+    if (checked === 0) ctx.skip();
+  });
+
   it("scenes and schedules", async () => {
     expect((await client.scenes()).proj_id).toBe(projId);
     expect((await client.schedules()).proj_id).toBe(projId);

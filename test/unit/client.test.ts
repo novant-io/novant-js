@@ -299,3 +299,46 @@ describe("typedef", () => {
     expect(query()).toEqual({});
   });
 });
+
+describe("point props", () => {
+  const point = () => ({
+    id: "s.1.4", name: "kW", type: "elec_power_sensor", addr: "ai.4", kind: "num",
+    unit: "kW", desc: "Main kW", ontology: { brick: "Power_Sensor" },
+    writable: false, schedule: "occupied", phase: "l1", direction: "import",
+  });
+  const core = ["id", "name", "type", "addr", "kind", "unit", "desc", "ontology", "writable", "props"];
+
+  it("points moves top-level props into props", async () => {
+    const bare = { id: "s.1.5", name: "x", type: "t", addr: "av.1", kind: "num", writable: true };
+    const { client } = stubClient({ proj_id: 1, points: [point(), bare] });
+    const res = await client.points({ source_id: "s.1" });
+    expect(res.points[0].props).toEqual({ schedule: "occupied", phase: "l1", direction: "import" });
+    expect(res.points[1].props).toEqual({});
+    // props are not duplicated at the root
+    expect(Object.keys(res.points[0]).sort()).toEqual([...core].sort());
+    expect(res.points[0].unit).toBe("kW");
+  });
+
+  it("sourceMaps moves props on map points", async () => {
+    const { client } = stubClient({
+      proj_id: 1,
+      source_maps: [{ id: "sm.1", name: "m", type: "bacnet", num_bound: 1, points: [{ ...point(), id: 4 }] }],
+    });
+    const res = await client.sourceMaps();
+    const p = res.source_maps[0].points[0];
+    expect(p.props).toEqual({ schedule: "occupied", phase: "l1", direction: "import" });
+    expect("schedule" in p).toBe(false);
+  });
+
+  it("keeps a props object returned by the api", async () => {
+    const { client } = stubClient({ proj_id: 1, points: [{ ...point(), props: { stage: "2" } }] });
+    const res = await client.points({ source_id: "s.1" });
+    expect(res.points[0].props).toEqual({ stage: "2", schedule: "occupied", phase: "l1", direction: "import" });
+  });
+
+  it("leaves other responses unchanged", async () => {
+    const resp = { proj_id: 1, values: [{ id: "s.1.4", val: 1, status: "ok", schedule: "x" }] };
+    const { client } = stubClient(resp);
+    expect(await client.values({ source_id: "s.1" })).toEqual(resp);
+  });
+});

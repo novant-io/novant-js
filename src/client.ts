@@ -274,8 +274,10 @@ export class NovantClient {
   }
 
   /** List source maps for this project. */
-  sourceMaps(opts: SourceMapsOptions = {}): Promise<SourceMapList> {
-    return this.#get("/source-maps", this.#params(opts));
+  async sourceMaps(opts: SourceMapsOptions = {}): Promise<SourceMapList> {
+    const res = await this.#get<SourceMapList>("/source-maps", this.#params(opts));
+    for (const m of res.source_maps ?? []) m.points?.forEach(nestPointProps);
+    return res;
   }
 
   //////////////////////////////////////////////////////////////////////
@@ -283,8 +285,10 @@ export class NovantClient {
   //////////////////////////////////////////////////////////////////////
 
   /** List points for a source, asset, or space. */
-  points(opts: PointsOptions): Promise<PointList> {
-    return this.#get("/points", this.#params(opts));
+  async points(opts: PointsOptions): Promise<PointList> {
+    const res = await this.#get<PointList>("/points", this.#params(opts));
+    res.points?.forEach(nestPointProps);
+    return res;
   }
 
   /** Get current values for points. */
@@ -522,6 +526,30 @@ export class NovantClient {
     }
     return JSON.parse(text) as T;
   }
+}
+
+// Core point fields; every other top-level key on a point is a prop.
+// Keep in sync with novant-python's _POINT_BASE_KEYS. The live test in
+// test/integration/endpoints.test.ts fails if the API adds a core field.
+const POINT_BASE_KEYS = new Set([
+  "id", "name", "type", "addr", "kind", "writable", "unit", "desc",
+  "enum", "enum_states", "ontology",
+]);
+
+/**
+ * Move point props, which the API returns as top-level keys, into a nested
+ * `props` object. If the API returns a `props` object itself, it is kept.
+ */
+function nestPointProps(point: object): void {
+  const p = point as Record<string, unknown>;
+  const props: Record<string, unknown> =
+    p.props !== null && typeof p.props === "object" ? (p.props as Record<string, unknown>) : {};
+  for (const k of Object.keys(p)) {
+    if (k === "props" || POINT_BASE_KEYS.has(k)) continue;
+    props[k] = p[k];
+    delete p[k];
+  }
+  p.props = props;
 }
 
 /** Encode a param value: arrays join with commas, bools as true/false. */

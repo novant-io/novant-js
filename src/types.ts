@@ -175,11 +175,9 @@ export interface SourceMapPoint {
   unit?: string;
   enum?: string;
   desc?: string;
-  schedule?: string;
-  mode?: string;
-  limit?: string;
-  modifier?: string;
   writable: boolean;
+  /** Point props that are set on this point; see `PointProps`. */
+  props: PointProps;
 }
 
 /** A template of points shared by every source bound to it. */
@@ -204,6 +202,25 @@ export interface SourceMapList {
 // Points
 /////////////////////////////////////////////////////////////////////////
 
+/**
+ * Point props, keyed by prop id. Only props set on the point are present.
+ * The API returns props as top-level keys on each point; the SDK moves them
+ * here. Known props are typed below; use `typedefPoints()` to list every
+ * prop and its allowed values.
+ */
+export interface PointProps {
+  schedule?: string;
+  mode?: string;
+  limit?: string;
+  modifier?: string;
+  phase?: string;
+  direction?: string;
+  simulation?: string;
+  stage?: string;
+  /** Props added to the registry after this SDK version. */
+  [prop: string]: unknown;
+}
+
 /** Point value kind. */
 export type PointKind = "num" | "bool" | "enum";
 
@@ -224,11 +241,9 @@ export interface Point {
   enum?: string;
   enum_states?: EnumState[];
   desc?: string;
-  schedule?: string;
-  mode?: string;
-  limit?: string;
-  modifier?: string;
   writable: boolean;
+  /** Point props that are set on this point; see `PointProps`. */
+  props: PointProps;
   ontology?: Ontology;
 }
 

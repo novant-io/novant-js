@@ -70,6 +70,15 @@ res.proj_id;            // 4821
 res.points[0].enum_states;
 ```
 
+The one exception is point props. The API returns props such as `schedule`
+or `phase` as top-level keys on each point; the SDK moves them into a nested
+`props` object, so new props are available without an SDK update:
+
+```js
+const { points } = await client.points({ source_id: "s.2" });
+points[0].props;        // { schedule: "occupied", mode: "cooling" }
+```
+
 Lists are passed as arrays and sent as comma separated values. To find an
 item by id, use standard array methods:
 
