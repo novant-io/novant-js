@@ -21,6 +21,7 @@ import type {
   SpaceList,
   StatusResponse,
   TrendData,
+  TypedefList,
   ValueList,
   WriteEntry,
   ZoneList,
@@ -202,6 +203,34 @@ export class NovantClient {
    */
   orgProjects(): Promise<OrgProjectList> {
     return this.#get("/org/projects", {});
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  // Typedef
+  //////////////////////////////////////////////////////////////////////
+
+  // Typedef endpoints are the global type registry, the same for every
+  // project, so they are not project scoped and never send proj_id.
+  // Types change rarely; fetch once and cache rather than per request.
+
+  /** List zone types. Zones have no props, so `props` is always empty. */
+  typedefZones(): Promise<TypedefList> {
+    return this.#get("/typedef/zones", {});
+  }
+
+  /** List space types and props. */
+  typedefSpaces(): Promise<TypedefList> {
+    return this.#get("/typedef/spaces", {});
+  }
+
+  /** List asset types and props. */
+  typedefAssets(): Promise<TypedefList> {
+    return this.#get("/typedef/assets", {});
+  }
+
+  /** List point types and props. */
+  typedefPoints(): Promise<TypedefList> {
+    return this.#get("/typedef/points", {});
   }
 
   //////////////////////////////////////////////////////////////////////

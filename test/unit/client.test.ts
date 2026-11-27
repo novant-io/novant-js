@@ -280,3 +280,22 @@ describe("errors", () => {
     expect(err.body).toBeUndefined();
   });
 });
+
+describe("typedef", () => {
+  it.each([
+    ["typedefZones", "/v1/typedef/zones"],
+    ["typedefSpaces", "/v1/typedef/spaces"],
+    ["typedefAssets", "/v1/typedef/assets"],
+    ["typedefPoints", "/v1/typedef/points"],
+  ] as const)("%s", async (method, path) => {
+    const resp = {
+      types: [{ id: "mech.ahu", name: "Air Handling Unit", desc: "...", service: "mech", ontology: { brick: "AHU", dbo: "AHU" } }],
+      props: [{ id: "meter_scope", name: "Meter Scope", type: "text", values: ["utility"], on: ["elec.meter"], desc: "..." }],
+    };
+    const { client, last, query } = stubClient(resp);
+    expect(await client[method]()).toEqual(resp);
+    expect(last().method).toBe("GET");
+    expect(last().url.pathname).toBe(path);
+    expect(query()).toEqual({});
+  });
+});

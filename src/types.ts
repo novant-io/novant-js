@@ -23,6 +23,7 @@ export interface Ontology {
   haystack?: string;
   vbis?: string;
   rec?: string;
+  dbo?: string;
 }
 
 /** Response from POST endpoints that perform an action. */
@@ -440,4 +441,40 @@ export interface ExplorerPointList {
   proj_id: number;
   source: ExplorerSource;
   points: ExplorerPoint[];
+}
+
+/////////////////////////////////////////////////////////////////////////
+// Typedef
+/////////////////////////////////////////////////////////////////////////
+
+/** A type from the type registry, as used in the `type` field of records. */
+export interface TypeDef {
+  id: string;
+  name: string;
+  desc: string;
+  /** Building service the type belongs to; omitted if none. */
+  service?: string;
+  ontology: Ontology;
+}
+
+/** A prop from the type registry. */
+export interface PropDef {
+  id: string;
+  name: string;
+  /** Value type, i.e. "text". */
+  type: string;
+  /** Allowed values when the prop has a fixed set; omitted otherwise. */
+  values?: string[];
+  /** Types the prop applies to: exact ids, "*" for all, or a prefix ending in "*". */
+  on: string[];
+  desc: string;
+}
+
+/**
+ * Response from `/v1/typedef/*`. Deprecated types are omitted, so a
+ * record may have a `type` that is not listed.
+ */
+export interface TypedefList {
+  types: TypeDef[];
+  props: PropDef[];
 }

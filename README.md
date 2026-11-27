@@ -103,6 +103,22 @@ await proj.zones();
 All responses from project endpoints include the `proj_id` they were
 served from.
 
+## Type Registry
+
+The typedef methods list the types and props Novant defines for zones,
+spaces, assets, and points. They are the same for every project, so they
+take no `proj_id`. Types change rarely, so fetch them once and cache them:
+
+```js
+const { types } = await client.typedefAssets();
+const names = new Map(types.map((t) => [t.id, t.name]));
+
+const { assets } = await client.assets();
+for (const a of assets) {
+  console.log(a.name, names.get(a.type) ?? a.type);
+}
+```
+
 ## Writes
 
 Writing to points requires a Control API key:

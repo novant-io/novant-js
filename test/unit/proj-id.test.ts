@@ -51,11 +51,21 @@ function sentProjId(call: Call): string | null {
     : null;
 }
 
+// methods that are not project scoped and never send proj_id
+const UNSCOPED: [string, (c: C) => Promise<unknown>][] = [
+  ["orgProjects",   (c) => c.orgProjects()],
+  ["typedefZones",  (c) => c.typedefZones()],
+  ["typedefSpaces", (c) => c.typedefSpaces()],
+  ["typedefAssets", (c) => c.typedefAssets()],
+  ["typedefPoints", (c) => c.typedefPoints()],
+];
+
 describe("proj_id on all project methods", () => {
-  it("covers every public project method", () => {
+  it("covers every public method", () => {
     const methods = Object.getOwnPropertyNames(NovantClient.prototype)
-      .filter((n) => n !== "constructor" && n !== "orgProjects");
-    expect(new Set(methods)).toEqual(new Set(CALLS.map(([n]) => n)));
+      .filter((n) => n !== "constructor");
+    const covered = [...CALLS, ...UNSCOPED].map(([n]) => n);
+    expect(new Set(methods)).toEqual(new Set(covered));
   });
 
   it.each(CALLS)("%s omits proj_id by default", async (_, call) => {
@@ -89,9 +99,9 @@ describe("proj_id on all project methods", () => {
     expect(query()).toEqual({ proj_id: "4821" });
   });
 
-  it("orgProjects ignores client default proj_id", async () => {
-    const { client, query } = stubClient({ projects: [] }, 200, { projId: 4821 });
-    await client.orgProjects();
+  it.each(UNSCOPED)("%s ignores client default proj_id", async (_, call) => {
+    const { client, query } = stubClient({}, 200, { projId: 4821 });
+    await call(client);
     expect(query()).toEqual({});
   });
 });
